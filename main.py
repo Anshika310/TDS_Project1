@@ -93,9 +93,7 @@ def describe_image_gemini_2(base64_img: str) -> str:
     try:
         img_data = base64.b64decode(base64_img)
         mime = mimetypes.guess_type("file.png")[0] or "image/png"
-
         model = genai.GenerativeModel("gemini-2.0-flash")
-
         response = model.generate_content(
             [
                 "Describe the content of this image in detail, focusing on any text, objects, or relevant features that could help answer questions about it.",
@@ -104,18 +102,11 @@ def describe_image_gemini_2(base64_img: str) -> str:
             ],
             generation_config={"temperature": 0.3, "max_output_tokens": 512}
         )
-
         return response.text.strip()
-
     except Exception as e:
         return "[Image description failed]"
-
-
-# --------- Gemini Response ---------
-
-
+        
 # ------new version---------google-generativeai
-
 
 def call_gemini_llm(question_text: str, img_desc: str, top_chunks: list):
     prompt = f"""Using the following context, answer the question clearly and helpfully.
@@ -166,35 +157,20 @@ class SimpleQuestion(BaseModel):
 async def answer_question(payload: SimpleQuestion):
     question_text = payload.question
     img_desc = ""
-
     # Step 1: Describe image (if present)
     if payload.image:
         img_desc = describe_image_gemini_2(payload.image)  # Gemini 2.0 Flash
-
-    # Step 2: Embed (question + optional image description)
     full_query = question_text + " " + img_desc
     embed = get_embedding(full_query)
-
-    # Step 3: Retrieve top 10 similar text chunks
-    # sim = cosine_similarity(embed, stored_embeddings)
-    # top_idx = sim.argsort()[-10:][::-1]
-    # top_chunks = [stored_metadata[i] for i in top_idx]
-
     # step 3 chnaged:
-    # Ensure correct shape and type
     embed = np.array(embed, dtype=np.float32)
     stored_matrix = np.array(stored_embeddings, dtype=np.float32)
-
-    # Cosine similarity calculation (dot product version)
     similarities = np.dot(stored_matrix, embed) / (
         np.linalg.norm(stored_matrix, axis=1) * np.linalg.norm(embed)
     )
-
-    # Get top 10 indices with highest similarity
     top_idx = np.argsort(similarities)[-10:][::-1]
     top_chunks = [stored_metadata[i] for i in top_idx]
-    # till above chnage 3
-
+    # 3
     # Step 4: Generate answer using Gemini
     prompt = f"""Answer the following question using the provided context.
 If helpful, include relevant link URLs from the text as clickable markdown links.
@@ -214,7 +190,7 @@ Context:
     parsed = format_gemini_response(response.text.strip())
     return parsed
 
-
+'''
 @app.post("/generate-answer/")
 async def process_yaml(file: UploadFile):
     try:
@@ -223,31 +199,20 @@ async def process_yaml(file: UploadFile):
         validated = QuestionSet(**parsed_yaml)
     except Exception as e:
         return JSONResponse(status_code=400, content={"error": f"Invalid YAML: {str(e)}"})
-
     results = []
-
     for q in validated.questions:
         question_text = q.text
         img_desc = ""
 
         if q.image:
             img_desc = describe_image_gemini_2(q.image)
-
         combined_text = question_text + " " + img_desc
         embed = get_embedding(combined_text)
-
-        # sim = cosine_similarity(embed, stored_embeddings)
-        # top_idx = sim.argsort()[-10:][::-1]
-        # top_chunks = [stored_metadata[i] for i in top_idx]
         embed = np.array(embed, dtype=np.float32)
         stored_matrix = np.array(stored_embeddings, dtype=np.float32)
-
-        # Cosine similarity calculation (dot product version)
         similarities = np.dot(stored_matrix, embed) / (
             np.linalg.norm(stored_matrix, axis=1) * np.linalg.norm(embed)
         )
-
-        # Get top 10 indices with highest similarity
         top_idx = np.argsort(similarities)[-10:][::-1]
         top_chunks = [stored_metadata[i] for i in top_idx]
 
@@ -260,17 +225,10 @@ async def process_yaml(file: UploadFile):
     })
 
     return {"responses": results}
-
+'''
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-'''
-with open("OIP.jpg", "rb") as img_file:
-    img_b64 = base64.b64encode(img_file.read()).decode()
-result = describe_image_gemini_2(img_b64)
-print(result)
-print(traceback.format_exc())
-'''
 
-handler = Mangum(app)
+#handler = Mangum(app)
