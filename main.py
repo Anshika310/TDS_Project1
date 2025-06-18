@@ -26,18 +26,6 @@ load_dotenv()
 
 
 # Initialize clients
-'''
-openai_client = OpenAI(
-    api_key="your-aipipe-key",
-    base_url="https://aipipe.org/openai/v1"
-)
-
-
-api_key = os.getenv("AIPIPE_API_KEY")
-base_url = os.getenv("AIPIPE_BASE_URL")
-
-client = OpenAI(api_key=api_key, base_url=base_url)
-'''
 
 openai_client = OpenAI(
     api_key=os.getenv("AIPIPE_API_KEY"),
@@ -123,60 +111,8 @@ def describe_image_gemini_2(base64_img: str) -> str:
         return "[Image description failed]"
 
 
-'''
-import google.generativeai as genai
-import base64
-import mimetypes
-import os
-
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-def describe_image_gemini_2(base64_img: str) -> str:
-    try:
-        img_data = base64.b64decode(base64_img)
-        mime = mimetypes.guess_type("file.png")[0] or "image/png"
-
-        # Use Gemini 2.0 Flash model
-        model = genai.GenerativeModel("gemini-2.0-flash")
-
-        response = model.generate_content(
-            [
-                "Describe the content of this image in detail, focusing on any text, objects, or relevant features that could help answer questions about it.",
-                genai.types.content.Part.from_data(
-                    data=img_data, mime_type=mime)
-            ],
-            generation_config={
-                "temperature": 0.3,
-                "max_output_tokens": 512
-            }
-        )
-
-        return response.text.strip()
-
-    except Exception as e:
-        return "[Image description failed]"
-'''
-
 # --------- Gemini Response ---------
-'''
 
-def call_gemini_llm(question_text: str, img_desc: str, top_chunks: list):
-    prompt = f"""Using the following context, answer the question clearly and helpfully.
-
-Question: {question_text}
-Image Description: {img_desc}
-
-Relevant Information:
-{chr(10).join(top_chunks)}
-"""
-    contents = [{"role": "user", "parts": [{"text": prompt}]}]
-    response = genai_client.models.generate_content(
-        model=gemini_model,
-        contents=contents,
-        generation_config={"temperature": 0.7, "max_output_tokens": 1024}
-    )
-    return response.text.strip()
-'''
 
 # ------new version---------google-generativeai
 
