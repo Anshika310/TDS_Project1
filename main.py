@@ -37,10 +37,25 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # gemini_model = "models/gemini-2.0-flash"
 # genai_client = genai
 
+import requests
+from io import BytesIO
+
+def load_embeddings():
+    url = "https://github.com/Anshika310/TDS_Project1/releases/download/v1.0.0/successful_embeddings_with_metadata.npz"
+    response = requests.get(url)
+    db = np.load(BytesIO(response.content), allow_pickle=True)
+    stored_embeddings = db["embeddings"]
+    stored_metadata = db["metadata"] 
+    return stored_embeddings, stored_metadata
+
+# Load embeddings at startup
+stored_embeddings, stored_metadata = load_embeddings()
+
+
 # Load .npz file
-db = np.load("successful_embeddings_with_metadata.npz", allow_pickle=True)
-stored_embeddings = db["embeddings"]
-stored_metadata = db["metadata"]  # Actual text chunks
+#db = np.load("successful_embeddings_with_metadata.npz", allow_pickle=True)
+#stored_embeddings = db["embeddings"]
+#stored_metadata = db["metadata"]  # Actual text chunks
 
 # Initialize app
 app = FastAPI()
