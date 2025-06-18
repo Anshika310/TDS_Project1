@@ -190,43 +190,6 @@ Context:
     parsed = format_gemini_response(response.text.strip())
     return parsed
 
-'''
-@app.post("/generate-answer/")
-async def process_yaml(file: UploadFile):
-    try:
-        raw = await file.read()
-        parsed_yaml = yaml.safe_load(raw)
-        validated = QuestionSet(**parsed_yaml)
-    except Exception as e:
-        return JSONResponse(status_code=400, content={"error": f"Invalid YAML: {str(e)}"})
-    results = []
-    for q in validated.questions:
-        question_text = q.text
-        img_desc = ""
-
-        if q.image:
-            img_desc = describe_image_gemini_2(q.image)
-        combined_text = question_text + " " + img_desc
-        embed = get_embedding(combined_text)
-        embed = np.array(embed, dtype=np.float32)
-        stored_matrix = np.array(stored_embeddings, dtype=np.float32)
-        similarities = np.dot(stored_matrix, embed) / (
-            np.linalg.norm(stored_matrix, axis=1) * np.linalg.norm(embed)
-        )
-        top_idx = np.argsort(similarities)[-10:][::-1]
-        top_chunks = [stored_metadata[i] for i in top_idx]
-
-    final_response = call_gemini_llm(question_text, img_desc, top_chunks)
-
-    results.append({
-        "question": question_text,
-        "image_description": img_desc,
-        "response": final_response
-    })
-
-    return {"responses": results}
-'''
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
