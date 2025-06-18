@@ -10,4 +10,3 @@ googleapis-common-protos
 protobuf>=4.25.1
 google-generativeai
 python-multipart
-magnum
