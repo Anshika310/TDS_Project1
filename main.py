@@ -18,6 +18,16 @@ from openai import OpenAI
 # from google import genai
 import google.generativeai as genai
 from google.generativeai import GenerativeModel
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or specify your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],  # or ["POST"] if you're strict
+    allow_headers=["*"]
+)
+
 
 # from genai.schemas import Content, Part
 
