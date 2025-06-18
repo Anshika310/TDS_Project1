@@ -21,8 +21,8 @@ from google.generativeai import GenerativeModel
 
 # from genai.schemas import Content, Part
 
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 
 # Initialize clients
